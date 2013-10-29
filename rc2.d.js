@@ -12,12 +12,37 @@ module.exports = function(appname, defaults){
 	}
 	require.main.rcName= appname
 	try{
-		return rc1(appname)
+		return require.main.rc= rc1(appname)
 	}catch(e){}
 }
 
 module.exports.sub= function(mod){
-	
+	return mux(modulate(mod))
+}
+
+function modName(mod){
+	var path= mod.filename,
+	  a= path.lastIndexOf("/")+1,
+	  b= path.lastIndexOf("."),
+	  name= path.substring(a,b)
+	return name
+}
+
+function modulate(mod){
+	var mods= [],
+	  hist= []
+	  rv= []
+	while(mod){
+		mods.push(mod)
+		mod= mod.parent
+	}
+	while(mods.length){
+		var name= modName(mods.pop())
+		hist.push(name)
+		var full= hist.join("-")
+		rv.push(rc1(full), rc1(rc1(name), require.main.rcName+"-"+full))
+	}
+	return rv
 }
 
 function mux(){
