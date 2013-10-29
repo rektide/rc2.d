@@ -10,14 +10,10 @@ module.exports = function(appname, defaults){
 	if(appname)
 		return rc1(appname)
 	try{
-		var file = require("fs").readFileSync("package.json","utf8"),
-		  o= JSON.parse(file)
-		if(!o || !o.name)
-			throw "No name"
-		return rc1(o.name)
+		return rc1(require("package.json").name)
 	}catch(e){
 	}
-};
+}
 
 if(require.main == module){
 	console.log(module.exports(process.argv[2]))
