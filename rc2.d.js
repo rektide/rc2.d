@@ -7,12 +7,27 @@ module.exports = function(appname, defaults){
 		appname= null
 	}
 
-	if(appname)
-		return rc1(appname)
-	try{
-		return rc1(require("package.json").name)
-	}catch(e){
+	if(!appname){
+		appname= require("package.json").name
 	}
+	require.main.rcName= appname
+	try{
+		return rc1(appname)
+	}catch(e){}
+}
+
+module.exports.sub= function(mod){
+	
+}
+
+function mux(){
+	var o= {}
+	for(var i= arguments.length; i>= 0; --i){
+		for(var j in arguments[i]){
+			o[j]= arguments[i][j]
+		}
+	}
+	return o
 }
 
 if(require.main == module){
