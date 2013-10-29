@@ -29,9 +29,10 @@ function modName(mod){
 }
 
 function modulate(mod){
-	var mods= [],
-	  hist= []
-	  rv= []
+	var top= require.main.rcName+"-",
+	  mods= [],
+	  hist= [],
+	  rv= [require.main.rc]
 	while(mod){
 		mods.push(mod)
 		mod= mod.parent
@@ -39,8 +40,9 @@ function modulate(mod){
 	while(mods.length){
 		var name= modName(mods.pop())
 		hist.push(name)
-		var full= hist.join("-")
-		rv.push(rc1(full), rc1(rc1(name), require.main.rcName+"-"+full))
+		var full= hist.join("-"),
+		  full2= full.substring(full.indexOf("-")+1)
+		rv.push(rc1(full), rc1(full2+name), rc1(top+name), rc1(name))
 	}
 	return rv
 }
