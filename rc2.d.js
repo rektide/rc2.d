@@ -8,16 +8,16 @@ module.exports = function(appname, defaults){
 	}
 
 	if(!appname){
-		appname= require("package.json").name
+		appname= require("./package.json").name
 	}
 	require.main.rcName= appname
 	try{
-		return require.main.rc= rc1(appname)
+		return require.main.rc= modulate(module)
 	}catch(e){}
 }
 
 module.exports.sub= function(mod){
-	return mux(modulate(mod))
+	return modulate(mod)
 }
 
 function modName(mod){
@@ -30,21 +30,25 @@ function modName(mod){
 
 function modulate(mod){
 	var top= require.main.rcName+"-",
+	  thisName= modName(mod),
 	  mods= [],
 	  hist= [],
-	  rv= [require.main.rc]
+	  rv= []
 	while(mod){
-		mods.push(mod)
+		mods.push(modName(mod))
 		mod= mod.parent
 	}
+	mods[mods.length-1]= require.main.rcName
 	while(mods.length){
-		var name= modName(mods.pop())
-		hist.push(name)
+		var mod= mods.pop()
+		hist.push(mod)
 		var full= hist.join("-"),
 		  full2= full.substring(full.indexOf("-")+1)
-		rv.push(rc1(full), rc1(full2+name), rc1(top+name), rc1(name))
+		rv.unshift(full, top+mod, full2+(mods.length?"-"+thisName:""), mod)
 	}
-	return rv
+	module.exports.debug && module.exports.debug(rv)
+	rv= rv.map(rc1)
+	return mux(rv,require.main.rc)
 }
 
 function mux(){
